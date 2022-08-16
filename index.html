@@ -1,0 +1,251 @@
+<html>
+<head>
+	<title>Mouse Tracking Simulator</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<style type="text/css">
+
+* {
+	padding: 0;
+	margin: 0;
+}
+
+html {
+	background-color: rgb(15, 15, 15);
+	color: white;
+	font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+h1 {
+	padding: 20px;
+	text-align: center;
+	width: calc(100% - 40px);
+}
+
+h3 {
+	padding: 10px;
+	text-align: center;
+	width: calc(100% - 20px);
+}
+
+#container {
+	width: 100%;
+	height: calc(100vh - 78px - 42px);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	perspective: 600px;
+}
+#front, .back {
+	width: 400px;
+	height: 400px;
+	border-radius: 200px;
+	position: absolute;
+}
+
+#front {
+	background: conic-gradient(from 90deg, 
+		#CACACA 0deg,
+		hsl(0, 0%, 48%) 45deg,
+		#CACACA 90deg,
+		hsl(0, 0%, 48%) 135deg,
+		#CACACA 180deg,
+		hsl(0, 0%, 48%) 225deg,
+		#CACACA 270deg,
+		hsl(0, 0%, 48%) 315deg,
+		#CACACA 360deg);
+}
+
+.back {
+	background-color: #AAAAAA;
+}
+
+</style>
+<body>
+	<h1>Gyroscope Simulator</h1>
+	<h3><i>Use mouse to control angle of circle.</i></h3>
+	<div id="container">
+
+		<!-- 3D Effect -->
+		<div class="back" id="1"></div>
+		<div class="back" id="2"></div>
+		<div class="back" id="3"></div>
+		<div class="back" id="4"></div>
+		<div class="back" id="5"></div>
+		<div class="back" id="6"></div>
+		<div class="back" id="7"></div>
+		<div class="back" id="8"></div>
+		<div class="back" id="9"></div>
+		<div class="back" id="10"></div>
+
+		<!-- Gradient -->
+		<div id="front"></div>
+	</div>
+
+<script type="text/javascript">
+
+var height = $(window).height();
+var width = $(window).width();
+var widthCenter;
+var distFromWidthCenter;
+var widthMultiplier = 7;
+
+var heightCenter;
+var distFromHeightCenter;
+var heightMultiplier = 7;
+
+$(document).ready(function() {
+
+	height = $(window).height();
+	width = $(window).width();
+
+	// Get mouse pos
+    var currentMousePos = { x: -1, y: -1 };
+    $(document).mousemove(function(event) {
+
+			height = $(window).height();
+			width = $(window).width();
+
+	        currentMousePos.x = event.pageX;
+	        currentMousePos.y = event.pageY;
+
+	        // Width
+	        widthCenter = width / 2;
+
+	        distFromWidthCenter = widthCenter - currentMousePos.x;
+
+	        distFromWidthCenterDeg = (distFromWidthCenter / (widthCenter + (widthMultiplier * 100))) * 100;
+	      
+	    	// Height
+	        heightCenter = height / 2;
+
+	        distFromHeightCenter = (heightCenter - currentMousePos.y) * -1;
+
+	        distFromHeightCenterDeg = (distFromHeightCenter / (heightCenter + (heightMultiplier * 100))) * 100;
+
+	        circlPos = (Math.atan2(currentMousePos.y-heightCenter,currentMousePos.x-widthCenter)) * 180 / 3.14159;
+
+	        distFromWidthCenterDeg *= -1;
+	        distFromHeightCenterDeg *= -1;
+
+	        if (circlPos > 0) {
+
+	        	let leftDark = 'hsl(0, 0%, ' + (48 - distFromWidthCenter / 40) + '%)';
+	        	let rightDark = 'hsl(0, 0%, ' + (48 - (distFromWidthCenter / 40) * -1) + '%)';
+
+		    	$('#front').css({
+				  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ')',
+				  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ')',
+				  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ')',
+				  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ')',
+				  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ')',
+				  'background'		  : 'conic-gradient(from ' + (270 - distFromWidthCenter / 50) + 'deg, #CACACA 0deg, ' + leftDark + ' 45deg, #CACACA 90deg, ' + rightDark + ' 135deg, #CACACA 180deg, ' + leftDark + ' 225deg, #CACACA 270deg, ' + rightDark + ' 315deg, #CACACA 360deg)'
+				});
+	    	} else {
+	    		
+	    		let leftDark = 'hsl(0, 0%, ' + (48 - distFromWidthCenter / 40) + '%)';
+	        	let rightDark = 'hsl(0, 0%, ' + (48 - (distFromWidthCenter / 40) * -1) + '%)';
+
+		    	$('#front').css({
+				  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ')',
+				  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ')',
+				  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ')',
+				  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ')',
+				  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ')',
+				  'background'		  : 'conic-gradient(from ' + (270 - distFromWidthCenter / 50) + 'deg, #CACACA 0deg, ' + leftDark + ' 45deg, #CACACA 90deg, ' + rightDark + ' 135deg, #CACACA 180deg, ' + leftDark + ' 225deg, #CACACA 270deg, ' + rightDark + ' 315deg, #CACACA 360deg)'
+				});    		
+	    	}
+
+	    	$('#1').css({
+			  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 1)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 1))) * -1) + 'px)',
+			  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 1)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 1))) * -1) + 'px)',
+			  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 1)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 1))) * -1) + 'px)',
+			  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 1)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 1))) * -1) + 'px)',
+			  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 1)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 1))) * -1) + 'px)'
+			});
+
+	    	$('#2').css({
+			  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 2)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 2))) * -1) + 'px)',
+			  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 2)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 2))) * -1) + 'px)',
+			  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 2)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 2))) * -1) + 'px)',
+			  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 2)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 2))) * -1) + 'px)',
+			  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 2)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 2))) * -1) + 'px)'
+			});
+
+	    	$('#3').css({
+			  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 3)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 3))) * -1) + 'px)',
+			  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 3)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 3))) * -1) + 'px)',
+			  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 3)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 3))) * -1) + 'px)',
+			  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 3)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 3))) * -1) + 'px)',
+			  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 3)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 3))) * -1) + 'px)'
+			});
+
+	    	$('#4').css({
+			  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 4)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 4))) * -1) + 'px)',
+			  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 4)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 4))) * -1) + 'px)',
+			  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 4)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 4))) * -1) + 'px)',
+			  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 4)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 4))) * -1) + 'px)',
+			  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 4)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 4))) * -1) + 'px)'
+			});
+
+	    	$('#5').css({
+			  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 5)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 5))) * -1) + 'px)',
+			  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 5)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 5))) * -1) + 'px)',
+			  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 5)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 5))) * -1) + 'px)',
+			  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 5)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 5))) * -1) + 'px)',
+			  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 5)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 5))) * -1) + 'px)'
+			});
+
+	    	$('#6').css({
+			  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 2)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 6))) * -1) + 'px)',
+			  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 6)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 6))) * -1) + 'px)',
+			  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 6)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 6))) * -1) + 'px)',
+			  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 6)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 6))) * -1) + 'px)',
+			  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 6)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 6))) * -1) + 'px)'
+			});
+
+	    	$('#7').css({
+			  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 7)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 7))) * -1) + 'px)',
+			  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 7)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 7))) * -1) + 'px)',
+			  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 7)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 7))) * -1) + 'px)',
+			  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 7)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 7))) * -1) + 'px)',
+			  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 7)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 7))) * -1) + 'px)'
+			});
+
+	    	$('#8').css({
+			  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 8)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 8))) * -1) + 'px)',
+			  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 8)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 8))) * -1) + 'px)',
+			  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 8)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 8))) * -1) + 'px)',
+			  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 8)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 8))) * -1) + 'px)',
+			  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 8)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 8))) * -1) + 'px)'
+			});
+
+	    	$('#9').css({
+			  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 9)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 9))) * -1) + 'px)',
+			  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 9)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 9))) * -1) + 'px)',
+			  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 9)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 9))) * -1) + 'px)',
+			  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 9)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 9))) * -1) + 'px)',
+			  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 9)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 9))) * -1) + 'px)'
+			});
+
+	    	$('#10').css({
+			  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 10)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 10))) * -1) + 'px)',
+			  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 10)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 10))) * -1) + 'px)',
+			  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 10)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 10))) * -1) + 'px)',
+			  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 10)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 10))) * -1) + 'px)',
+			  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 10)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 10))) * -1) + 'px)'
+			});
+
+	        // if (currentMousePos.x < widthCenter) {
+	        // 	console.log(widthCenter - currentMousePos.x);
+
+	        // } else if (currentMousePos.x > widthCenter) {
+	        // 	console.log(currentMousePos.x - widthCenter);
+	        // }
+
+
+    });
+});
+</script>
+</body>
+</html>

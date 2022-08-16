@@ -1,0 +1,302 @@
+<html>
+<head>
+	<title>v3 / Mouse Tracking Simulator</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<style type="text/css">
+
+* {
+	padding: 0;
+	margin: 0;
+}
+
+html {
+	background-color: rgb(15, 15, 15);
+	color: white;
+	font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+h1 {
+	padding: 20px;
+	text-align: center;
+	width: calc(100% - 40px);
+}
+
+h3 {
+	padding: 10px;
+	text-align: center;
+	width: calc(100% - 20px);
+}
+
+#container {
+	width: 100%;
+	height: calc(100vh - 78px - 42px);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	perspective: 600px;
+	will-change: transform, backdrop-filter, mix-blend-mode;
+}
+#front, .back, #blur, #overlay, #card {
+	width: 400px;
+	height: 300px;
+	border-radius: 20px;
+	position: absolute;
+}
+
+#front {
+	background: conic-gradient(from 45deg, 
+		hsl(0, 0%, 48%) 0deg,
+		#CACACA 45deg,
+		hsl(0, 0%, 48%) 90deg,
+		#CACACA 135deg,
+		hsl(0, 0%, 48%) 180deg,
+		#CACACA 225deg,
+		hsl(0, 0%, 48%) 270deg,
+		#CACACA 315deg,
+		hsl(0, 0%, 48%) 360deg);
+}
+
+.back {
+	background-color: #AAAAAA;
+}
+
+#blur {
+	backdrop-filter: blur(5px);
+}
+
+#overlay {
+	background-image: url(overlay.svg);
+	background-size: 500px, 500px;
+	background-repeat: none;
+	background-position: center;
+	mix-blend-mode: soft-light;
+	opacity: 0.8;
+}
+
+#card {
+	outline: rgba(255, 255, 255, 0.8) solid 1px;
+	display: flex;
+	align-items: left;
+}
+</style>
+<body>
+	<h1>Gyroscope Simulator v3</h1>
+	<h3><i>Use mouse to control angle of shape.</i></h3>
+	<div id="container">
+
+ 		<!-- 3D Effect
+		<div class="back" id="1"></div>
+		<div class="back" id="2"></div>
+		<div class="back" id="3"></div>
+		<div class="back" id="4"></div>
+		<div class="back" id="5"></div>
+		<div class="back" id="6"></div>
+		<div class="back" id="7"></div>
+		<div class="back" id="8"></div>
+		<div class="back" id="9"></div>
+		<div class="back" id="10"></div> -->
+
+		<!-- Gradient -->
+		<div id="front"></div>
+		<div id="blur"></div>
+		<div id="overlay"></div>
+		<div id="card">
+			<p style="font-size: 17px; margin-left: 20px; margin-top: calc(300px - 40px);"><a style="letter-spacing: 3px;">••••</a> 1234</p>
+			<img style="margin-left: 180px; margin-top: 210px" src="mastercard.svg" width="100" height="75"></img>
+		</div>
+	</div>
+
+<script type="text/javascript">
+
+var height = $(window).height();
+var width = $(window).width();
+var widthCenter;
+var distFromWidthCenter;
+var widthMultiplier = 7;
+
+var heightCenter;
+var distFromHeightCenter;
+var heightMultiplier = 7;
+
+var transformation;
+var leftDark;
+var rightDark;
+
+$(document).ready(function() {
+
+	height = $(window).height();
+	width = $(window).width();
+
+	// Get mouse pos
+    var currentMousePos = { x: -1, y: -1 };
+    $(document).mousemove(function(event) {
+
+    		// Get Window Size
+			height = $(window).height();
+			width = $(window).width();
+
+			// Get mouse position (Starting from top, left)
+	        currentMousePos.x = event.pageX;
+	        currentMousePos.y = event.pageY;
+
+	        // Width Data
+		        // X-Axis Center
+		        widthCenter = width / 2;
+
+		        // Mouse distance from X-Axis Center
+		        distFromWidthCenter = widthCenter - currentMousePos.x;
+
+				// Distance from X-Axis center in degrees (Used for rotation)
+		        distFromWidthCenterDeg = (distFromWidthCenter / (widthCenter + (widthMultiplier * 100))) * -100; 
+	      
+	    	// Height Data
+		    	// Y-Axis Center
+		        heightCenter = height / 2;
+
+		        // Mouse distance from Y-Axis Center
+		        distFromHeightCenter = (heightCenter - currentMousePos.y) * -1;
+
+		        // Distance from Y-Axis center in degrees (Used for rotation)
+		        distFromHeightCenterDeg = (distFromHeightCenter / (heightCenter + (heightMultiplier * 100))) * -100;
+
+
+		    // Create 3D transformation string for front div
+	        transformation = 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ')';
+
+	        // Apply 3D transformations
+	        $('#front').css({
+				'-webkit-transform' : transformation,
+				'-moz-transform'    : transformation,
+				'-ms-transform'     : transformation,
+				'-o-transform'      : transformation,
+				'transform'         : transformation,
+			});
+
+	        $('#blur').css({
+				'-webkit-transform' : transformation,
+				'-moz-transform'    : transformation,
+				'-ms-transform'     : transformation,
+				'-o-transform'      : transformation,
+				'transform'         : transformation,
+			});
+
+	        $('#overlay').css({
+				'-webkit-transform' : transformation,
+				'-moz-transform'    : transformation,
+				'-ms-transform'     : transformation,
+				'-o-transform'      : transformation,
+				'transform'         : transformation,
+			});
+
+	        $('#card').css({
+				'-webkit-transform' : transformation,
+				'-moz-transform'    : transformation,
+				'-ms-transform'     : transformation,
+				'-o-transform'      : transformation,
+				'transform'         : transformation,
+			});
+
+	        // Change gradient colours based on 3D direction
+	    	leftDark = 'hsl(0, 0%, ' + (48 - distFromWidthCenter / 40) + '%)';
+	       	rightDark = 'hsl(0, 0%, ' + (48 - (distFromWidthCenter / 40) * -1) + '%)';
+
+	       	// Check if mouse is above or below X-Axis
+	        if (distFromHeightCenter < 0) { // Above
+
+		    	$('#front').css({
+				  'background' : 'conic-gradient(from ' + ((45 - distFromHeightCenter / 40) - distFromWidthCenter / 50) + 'deg, ' + rightDark + ' 0deg, #CACACA ' + (45 - (distFromWidthCenter / 60) * 1) + 'deg, ' + leftDark + ' 90deg, #CACACA ' + (135 - (distFromWidthCenter / 30) * -1) + 'deg, ' + rightDark + ' 180deg, #CACACA ' + (225 - (distFromWidthCenter / 60) * 1) + 'deg, ' + leftDark + ' 270deg, #CACACA ' + (315 - (distFromWidthCenter / 30) * -1) + 'deg, ' + rightDark + ' 360deg)'
+				});
+	    	} else { // Below
+	    		
+		    	$('#front').css({
+				  'background' : 'conic-gradient(from ' + ((45 - distFromHeightCenter / 40) - distFromWidthCenter / 50) + 'deg, ' + rightDark + ' 0deg, #CACACA ' + (45 - (distFromWidthCenter / 60) * 1) + 'deg, ' + leftDark + ' 90deg, #CACACA ' + (135 - (distFromWidthCenter / 30) * -1) + 'deg, ' + rightDark + ' 180deg, #CACACA ' + (225 - (distFromWidthCenter / 60) * 1) + 'deg, ' + leftDark + ' 270deg, #CACACA ' + (315 - (distFromWidthCenter / 30) * -1) + 'deg, ' + rightDark + ' 360deg)'
+				});    		
+	    	}
+
+/*	    	// 3D Background 
+	    	$('#1').css({
+			  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 1)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 1))) * -1) + 'px)',
+			  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 1)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 1))) * -1) + 'px)',
+			  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 1)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 1))) * -1) + 'px)',
+			  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 1)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 1))) * -1) + 'px)',
+			  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 1)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 1))) * -1) + 'px)'
+			});
+
+	    	$('#2').css({
+			  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 2)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 2))) * -1) + 'px)',
+			  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 2)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 2))) * -1) + 'px)',
+			  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 2)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 2))) * -1) + 'px)',
+			  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 2)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 2))) * -1) + 'px)',
+			  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 2)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 2))) * -1) + 'px)'
+			});
+
+	    	$('#3').css({
+			  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 3)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 3))) * -1) + 'px)',
+			  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 3)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 3))) * -1) + 'px)',
+			  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 3)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 3))) * -1) + 'px)',
+			  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 3)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 3))) * -1) + 'px)',
+			  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 3)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 3))) * -1) + 'px)'
+			});
+
+	    	$('#4').css({
+			  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 4)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 4))) * -1) + 'px)',
+			  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 4)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 4))) * -1) + 'px)',
+			  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 4)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 4))) * -1) + 'px)',
+			  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 4)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 4))) * -1) + 'px)',
+			  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 4)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 4))) * -1) + 'px)'
+			});
+
+	    	$('#5').css({
+			  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 5)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 5))) * -1) + 'px)',
+			  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 5)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 5))) * -1) + 'px)',
+			  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 5)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 5))) * -1) + 'px)',
+			  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 5)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 5))) * -1) + 'px)',
+			  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 5)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 5))) * -1) + 'px)'
+			});
+
+	    	$('#6').css({
+			  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 2)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 6))) * -1) + 'px)',
+			  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 6)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 6))) * -1) + 'px)',
+			  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 6)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 6))) * -1) + 'px)',
+			  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 6)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 6))) * -1) + 'px)',
+			  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 6)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 6))) * -1) + 'px)'
+			});
+
+	    	$('#7').css({
+			  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 7)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 7))) * -1) + 'px)',
+			  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 7)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 7))) * -1) + 'px)',
+			  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 7)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 7))) * -1) + 'px)',
+			  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 7)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 7))) * -1) + 'px)',
+			  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 7)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 7))) * -1) + 'px)'
+			});
+
+	    	$('#8').css({
+			  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 8)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 8))) * -1) + 'px)',
+			  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 8)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 8))) * -1) + 'px)',
+			  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 8)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 8))) * -1) + 'px)',
+			  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 8)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 8))) * -1) + 'px)',
+			  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 8)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 8))) * -1) + 'px)'
+			});
+
+	    	$('#9').css({
+			  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 9)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 9))) * -1) + 'px)',
+			  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 9)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 9))) * -1) + 'px)',
+			  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 9)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 9))) * -1) + 'px)',
+			  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 9)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 9))) * -1) + 'px)',
+			  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 9)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 9))) * -1) + 'px)'
+			});
+
+	    	$('#10').css({
+			  '-webkit-transform' : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 10)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 10))) * -1) + 'px)',
+			  '-moz-transform'    : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 10)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 10))) * -1) + 'px)',
+			  '-ms-transform'     : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 10)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 10))) * -1) + 'px)',
+			  '-o-transform'      : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 10)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 10))) * -1) + 'px)',
+			  'transform'         : 'rotateY(' + distFromWidthCenterDeg + 'deg' + ') ' + 'rotateX(' + distFromHeightCenterDeg + 'deg' + ') translate(' + distFromWidthCenter / (15 + (4.5 * 10)) + 'px, ' + ((distFromHeightCenter / (15 + (4.5 * 10))) * -1) + 'px)'
+			});*/
+
+    });
+});
+</script>
+</body>
+</html>

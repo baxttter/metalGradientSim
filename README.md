@@ -1,2 +1,4 @@
 # metalGradientSim
-Gyroscope simulator used to test and recreate the anisotropic metal effect.
+Gyroscope simulator used to recreate and test the anisotropic metal effect.
+
+Try it here: https://baxttter.github.io/metalGradientSim
